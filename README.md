@@ -81,7 +81,7 @@ Get up and running in under 2 minutes:
 
 ```bash
 # Clone the repo first
-git clone https://github.com/Beijuyi/everything-claude-code.git
+git clone https://github.com/affaan-m/everything-claude-code.git
 
 # Copy rules (applies to all projects)
 cp -r everything-claude-code/rules/* ~/.claude/rules/
