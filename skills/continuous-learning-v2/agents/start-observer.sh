@@ -15,6 +15,7 @@ CONFIG_DIR="${HOME}/.claude/homunculus"
 PID_FILE="${CONFIG_DIR}/.observer.pid"
 LOG_FILE="${CONFIG_DIR}/observer.log"
 OBSERVATIONS_FILE="${CONFIG_DIR}/observations.jsonl"
+CONFIG_FILE="${CONFIG_DIR}/config.json"
 
 mkdir -p "$CONFIG_DIR"
 
@@ -82,10 +83,21 @@ case "${1:-start}" in
 
         echo "[$(date)] Analyzing $obs_count observations..." >> "$LOG_FILE"
 
-        # Use Claude Code with Haiku to analyze observations
+        # Read model from config.json, default to glm-4.7
+        OBSERVER_MODEL=$(python3 -c "
+import json
+try:
+    with open('$CONFIG_FILE') as f:
+        cfg = json.load(f)
+        print(cfg.get('observer', {}).get('model', 'glm-4.7'))
+except:
+    print('glm-4.7')
+" 2>/dev/null || echo "glm-4.7")
+
+        # Use Claude Code with the configured model to analyze observations
         # This spawns a quick analysis session
         if command -v claude &> /dev/null; then
-          claude --model haiku --max-turns 3 --print \
+          claude --model "$OBSERVER_MODEL" --max-turns 3 --print \
             "Read $OBSERVATIONS_FILE and identify patterns. If you find 3+ occurrences of the same pattern, create an instinct file in $CONFIG_DIR/instincts/personal/ following the format in the observer agent spec. Be conservative - only create instincts for clear patterns." \
             >> "$LOG_FILE" 2>&1 || true
         fi

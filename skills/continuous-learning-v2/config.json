@@ -18,7 +18,7 @@
   },
   "observer": {
     "enabled": false,
-    "model": "haiku",
+    "model": "glm-4.7",
     "run_interval_minutes": 5,
     "min_observations_to_analyze": 20,
     "patterns_to_detect": [
