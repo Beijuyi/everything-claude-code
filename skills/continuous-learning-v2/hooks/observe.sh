@@ -37,6 +37,18 @@
 set -e
 
 CONFIG_DIR="${HOME}/.claude/homunculus"
+
+# Convert Git Bash path to Windows path for Python
+if [[ "$HOME" == /c/* ]]; then
+  # Git Bash on Windows: /c/Users/... -> C:/Users/...
+  HOME_DIR_PART=$(basename "$HOME")
+  CONFIG_DIR_WIN="C:/Users/${HOME_DIR_PART}/.claude/homunculus"
+  OBSERVATIONS_FILE_WIN="${CONFIG_DIR_WIN}/observations.jsonl"
+else
+  CONFIG_DIR_WIN="$CONFIG_DIR"
+  OBSERVATIONS_FILE_WIN="${CONFIG_DIR}/observations.jsonl"
+fi
+
 OBSERVATIONS_FILE="${CONFIG_DIR}/observations.jsonl"
 MAX_FILE_SIZE_MB=10
 
@@ -137,7 +149,7 @@ if parsed['input']:
 if parsed['output']:
     observation['output'] = parsed['output']
 
-with open('$OBSERVATIONS_FILE', 'a') as f:
+with open('$OBSERVATIONS_FILE_WIN', 'a') as f:
     f.write(json.dumps(observation) + '\n')
 EOF
 
