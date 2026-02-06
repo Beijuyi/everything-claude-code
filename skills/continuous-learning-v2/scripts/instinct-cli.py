@@ -50,19 +50,16 @@ def parse_instinct_file(content: str) -> list[dict]:
     for line in content.split('\n'):
         if line.strip() == '---':
             if in_frontmatter:
-                # End of frontmatter
+                # End of frontmatter - don't reset content_lines, we'll accumulate content after this
                 in_frontmatter = False
-                if current:
-                    current['content'] = '\n'.join(content_lines).strip()
-                    instincts.append(current)
-                    current = {}
-                    content_lines = []
             else:
                 # Start of frontmatter
                 in_frontmatter = True
+                # If we have a previous instinct, save it now with accumulated content
                 if current:
                     current['content'] = '\n'.join(content_lines).strip()
                     instincts.append(current)
+                # Reset for new instinct
                 current = {}
                 content_lines = []
         elif in_frontmatter:
@@ -76,10 +73,11 @@ def parse_instinct_file(content: str) -> list[dict]:
                 else:
                     current[key] = value
         else:
+            # Accumulate content lines when not in frontmatter
             content_lines.append(line)
 
     # Don't forget the last instinct
-    if current:
+    if current and current.get('id'):
         current['content'] = '\n'.join(content_lines).strip()
         instincts.append(current)
 
